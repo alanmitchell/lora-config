@@ -5,6 +5,7 @@
 import sys
 from pathlib import Path
 import PySimpleGUI as sg
+from PySimpleGUI.PySimpleGUI import Button
 
 import config
 import sensor_utils
@@ -59,22 +60,29 @@ except Exception as e:
 bldg_abbrevs = [abbrev for abbrev, _ in bldgs]
 bldg_def = bldg_abbrevs[0]
 rows = []
-for s in sensors:
+for ix, s in enumerate(sensors):
     info = config.sensor_models[s['model'].lower()]
     desc = f"{s['model']}: {s['dev_eui'][-4:]}"
     ext_types = ['None'] + [typ for typ, _ in info['ext_types']]
     ext_def = 'None' if len(ext_types)==1 else ext_types[1]
     a_row = [
         sg.Text(desc),
-        sg.Combo(bldg_abbrevs, bldg_def),
-        sg.Combo(ext_types, ext_def),
-        sg.Input('', (20,1)),
+        sg.Combo(bldg_abbrevs, bldg_def, key=f'{ix}-bldg'),
+        sg.Combo(ext_types, ext_def, key=f'{ix}-ext'),
+        sg.Input('', (20,1), key=f'{ix}-name'),
     ]
-    a_row += [sg.Checkbox(sens[0], True if sens[0] != 'vdd' else False) for sens in info['sensors']]
-    a_row += [sg.Checkbox('snr', False)]
+    a_row += [sg.Checkbox(sens[0], True if sens[0] != 'vdd' else False, key=f'{ix}-{sens[0]}') for sens in info['sensors']]
+    a_row += [sg.Checkbox('snr', False, key=f'{ix}-snr')]
     rows.append(a_row)
 
-rows.append([sg.Button('OK', key='ok'), sg.Button('Cancel', key='cancel')])
+rows.append([sg.Text('')])
+rows.append([
+    sg.Button('Make Things V3 JSON File', key='make-v3'), 
+    sg.Button('Make Things V2 Text File', key='make-v2'),
+    sg.Button('Make BMON Spreadsheet', key='make-bmon'),
+    sg.Text('       '),
+    sg.Button('Exit', key='exit'),
+    ])
 
 # Create the Window
 #window = sg.Window('Edit Sensors', [[sg.Column(rows, scrollable=True)]])
@@ -85,7 +93,8 @@ while True:
     event, values = window.read()
     # End program if user closes window or
     # presses the OK button
-    if event == "ok" or event == sg.WIN_CLOSED:
+    if event == "exit" or event == sg.WIN_CLOSED:
+        print(values)
         break
 
 window.close()
