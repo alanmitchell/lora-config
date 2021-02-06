@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 import PySimpleGUI as sg
 
+import config
 import sensor_utils
 
 # create the Window that collects the sensor CSV file to open,
@@ -45,9 +46,46 @@ while True:
     if event == 'cancel' or event == sg.WIN_CLOSED:
         sys.exit(0)
 
-print(sensor_file)
-print(bldgs)
-
 win_init.close()
 
-print(sensor_utils.read_sensor_file(sensor_file))
+# Read the sensor file
+try:
+    sensors = sensor_utils.read_sensor_file(sensor_file)
+except Exception as e:
+    sg.popup(f'Error: {e}')
+    sys.exit(0)
+
+
+bldg_abbrevs = [abbrev for abbrev, _ in bldgs]
+bldg_def = bldg_abbrevs[0]
+rows = []
+for s in sensors:
+    info = config.sensor_models[s['model'].lower()]
+    desc = f"{s['model']}: {s['dev_eui'][-4:]}"
+    ext_types = ['None'] + [typ for typ, _ in info['ext_types']]
+    ext_def = 'None' if len(ext_types)==1 else ext_types[1]
+    a_row = [
+        sg.Text(desc),
+        sg.Combo(bldg_abbrevs, bldg_def),
+        sg.Combo(ext_types, ext_def),
+        sg.Input('', (20,1)),
+    ]
+    a_row += [sg.Checkbox(sens[0], True if sens[0] != 'vdd' else False) for sens in info['sensors']]
+    a_row += [sg.Checkbox('snr', False)]
+    rows.append(a_row)
+
+rows.append([sg.Button('OK', key='ok'), sg.Button('Cancel', key='cancel')])
+
+# Create the Window
+#window = sg.Window('Edit Sensors', [[sg.Column(rows, scrollable=True)]])
+window = sg.Window('Edit Sensors', rows)
+
+# Create an event loop
+while True:
+    event, values = window.read()
+    # End program if user closes window or
+    # presses the OK button
+    if event == "ok" or event == sg.WIN_CLOSED:
+        break
+
+window.close()

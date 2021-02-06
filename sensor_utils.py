@@ -17,7 +17,7 @@ def read_sensor_file(fn):
     raise ValueError('Unknown Sensor file type.')
 
 def read_elsys_file(fn):
-    """Reads an Elsys CSV file are returns a list of dictionaries containing key 
+    """Reads an Elsys CSV file and returns a list of dictionaries containing key 
     info for each sensor.
     """
     recs = []
