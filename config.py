@@ -71,3 +71,29 @@ sensor_models = {
         'ext_types': [],
     },
 }
+
+# This maps parameter suffixes to labels displayed in the BMON Sensor Title
+param_to_label = {
+    'accel_x': 'X Acceleration', 
+    'accel_y': 'Y Acceleration',
+    'accel_z': 'Z Acceleration', 
+    'analog': 'Voltage', 
+    'co2': 'CO2', 
+    'digital': 'State', 
+    'extTemperature': 'Temperature', 
+    'humidity': 'Humidity', 
+    'light': 'Light', 
+    'motion': 'Motion', 
+    'pressure': 'Pressure', 
+    'pulseAbs': 'Pulse Count', 
+    'temperature': 'Temperature', 
+    'vdd': 'Battery Voltage',
+    'snr': 'Signal SNR',
+}
+
+def param_label(param):
+    """Returns a label for a sensor parameter.  'param' is the abbrev
+    for that parameter.  If the parameter is not listed in the above mapping
+    dictionary, the Title case version of the parameter abbreviation is returned.
+    """
+    return param_to_label.get(param, param.title())
