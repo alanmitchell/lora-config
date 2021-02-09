@@ -59,7 +59,10 @@ except Exception as e:
 
 bldg_abbrevs = [abbrev for abbrev, _ in bldgs]
 bldg_def = bldg_abbrevs[0]
-rows = []
+rows = [
+    [sg.Text('Select Building, External Sensor type, Enter Base Sensor Description, and Check Readings to include in BMON')],
+]
+
 for ix, s in enumerate(sensors):
     info = config.sensor_models[s['model'].lower()]
     desc = f"{s['model']}: {s['dev_eui'][-4:]}"
@@ -96,6 +99,8 @@ def add_sensor_info(vals):
         s['bldg_abbrev'] = vals[f'{ix}-bldg']
         s['bldg'] = dict(bldgs)[s['bldg_abbrev']]
         s['name'] = vals[f'{ix}-name']
+        s['lora_ver'] = info['lora_ver']
+
         # make a list of the selected reading parameters
         params = []
 
@@ -117,8 +122,6 @@ def add_sensor_info(vals):
         # Add the final list to the sensor record
         s['params'] = params
         
-    from pprint import pprint
-    pprint(sensors)
     return
 
 # Create an event loop
@@ -128,10 +131,31 @@ while True:
     # presses the OK button
     if event == "exit" or event == sg.WIN_CLOSED:
         break
+
     elif event == 'make-v3':
         add_sensor_info(values)
+        file_contents = sensor_utils.make_things_v3_file(sensors)
+        fn = sg.popup_get_file(
+            'File to Save into.',
+            default_extension='json',
+            save_as=True,
+            file_types=(('JSON Files', '*.json'),),
+            no_window=True,
+            )
+        open(fn, 'w').write(file_contents)
+
     elif event == 'make-v2':
         add_sensor_info(values)
+        file_contents = sensor_utils.make_things_v2_file(sensors)
+        fn = sg.popup_get_file(
+            'File to Save into.',
+            default_extension='txt',
+            save_as=True,
+            file_types=(('Text Files', '*.txt'),),
+            no_window=True,
+            )
+        open(fn, 'w').write(file_contents)
+    
     elif event == 'make-bmon':
         add_sensor_info(values)
 
