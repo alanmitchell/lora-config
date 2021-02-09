@@ -49,13 +49,13 @@ while True:
 
 win_init.close()
 
-# Read the sensor file
+# Read the sensor file and make the Window that collects additional information for each
+# sensor.
 try:
     sensors = sensor_utils.read_sensor_file(sensor_file)
 except Exception as e:
     sg.popup(f'Error: {e}')
     sys.exit(0)
-
 
 bldg_abbrevs = [abbrev for abbrev, _ in bldgs]
 bldg_def = bldg_abbrevs[0]
@@ -67,11 +67,11 @@ for ix, s in enumerate(sensors):
     ext_def = 'None' if len(ext_types)==1 else ext_types[1]
     a_row = [
         sg.Text(desc),
-        sg.Combo(bldg_abbrevs, bldg_def, key=f'{ix}-bldg'),
-        sg.Combo(ext_types, ext_def, key=f'{ix}-ext'),
+        sg.Combo(bldg_abbrevs, bldg_def, key=f'{ix}-bldg', readonly=True),
+        sg.Combo(ext_types, ext_def, key=f'{ix}-ext', readonly=True),
         sg.Input('', (20,1), key=f'{ix}-name'),
     ]
-    a_row += [sg.Checkbox(sens[0], True if sens[0] != 'vdd' else False, key=f'{ix}-{sens[0]}') for sens in info['sensors']]
+    a_row += [sg.Checkbox(param[0], True if param[0] != 'vdd' else False, key=f'{ix}-{param[0]}') for param in info['params']]
     a_row += [sg.Checkbox('snr', False, key=f'{ix}-snr')]
     rows.append(a_row)
 
@@ -88,13 +88,52 @@ rows.append([
 #window = sg.Window('Edit Sensors', [[sg.Column(rows, scrollable=True)]])
 window = sg.Window('Edit Sensors', rows)
 
+def add_sensor_info(vals):
+    # adds info from User Input to list of sensors.
+    for ix, s in enumerate(sensors):
+        # Get the configuration info for this sensor type
+        info = config.sensor_models[s['model'].lower()]
+        s['bldg_abbrev'] = vals[f'{ix}-bldg']
+        s['bldg'] = dict(bldgs)[s['bldg_abbrev']]
+        s['name'] = vals[f'{ix}-name']
+        # make a list of the selected reading parameters
+        params = []
+
+        # Start with the external sensor
+        ext = vals[f'{ix}-ext']
+        if ext != 'None':
+            ext_param = dict(info['ext_types'])[ext]
+            params.append(ext_param)
+
+        # Loop the internal sensors to see if they are requested by the GUI
+        for nm, unit in info['params']:
+            if vals[f'{ix}-{nm}']:
+                params.append( (nm, unit) )
+
+        # Check for SNR request
+        if vals[f'{ix}-snr']:
+            params.append( ('snr', 'dB') )
+        
+        # Add the final list to the sensor record
+        s['params'] = params
+        
+    from pprint import pprint
+    pprint(sensors)
+    return
+
 # Create an event loop
 while True:
     event, values = window.read()
     # End program if user closes window or
     # presses the OK button
     if event == "exit" or event == sg.WIN_CLOSED:
-        print(values)
         break
+    elif event == 'make-v3':
+        add_sensor_info(values)
+    elif event == 'make-v2':
+        add_sensor_info(values)
+    elif event == 'make-bmon':
+        add_sensor_info(values)
 
 window.close()
+

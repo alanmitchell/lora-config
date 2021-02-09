@@ -12,7 +12,7 @@ ver_1_0_2b = ('MAC_V1_0_2', 'PHY_V1_0_2_REV_B')
 sensor_models = {
     'elt2': {
         'lora_ver': ver_1_0_2b,
-        'sensors': [                           # This list covers the built-in sensors
+        'params': [                           # This list covers the built-in reading types
             ('temperature', 'deg F'), 
             ('humidity', '%RH'), 
             ('pressure', 'millibars'), 
@@ -30,7 +30,7 @@ sensor_models = {
     },
     'eltlite': {
         'lora_ver': ver_1_0_2b,
-        'sensors': [('vdd', 'Volts')],
+        'params': [('vdd', 'Volts')],
         'ext_types': [
             ('Temperature', ('extTemperature', 'deg F')),
             ('Switch', ('digital', '1=On 0=Off')),
@@ -40,7 +40,7 @@ sensor_models = {
     },
     'ers': {
         'lora_ver': ver_1_0_2b,
-        'sensors': [
+        'params': [
             ('temperature', 'deg F'), 
             ('humidity', '%RH'),
             ('light', 'lux'),
@@ -51,7 +51,7 @@ sensor_models = {
     },
     'ersco2': {
         'lora_ver': ver_1_0_2b,
-        'sensors': [
+        'params': [
             ('temperature', 'deg F'), 
             ('humidity', '%RH'),
             ('light', 'lux'),
@@ -63,7 +63,7 @@ sensor_models = {
     },
     'erslite': {
         'lora_ver': ver_1_0_2b,
-        'sensors': [
+        'params': [
             ('temperature', 'deg F'), 
             ('humidity', '%RH'),
             ('vdd', 'Volts'),
