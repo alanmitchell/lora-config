@@ -3,6 +3,9 @@
 
 import json
 import pandas as pd
+from openpyxl import Workbook
+from openpyxl.styles import NamedStyle, Font, Border, Side, Alignment
+from openpyxl.utils import get_column_letter
 import config
 
 def read_sensor_file(fn):
@@ -45,7 +48,7 @@ def make_things_v3_file(sensors):
             'ids': {
                 'device_id': dev_id,
                 'dev_eui': s['dev_eui'],
-                'join-eui': s['app_eui'],
+                'join_eui': s['app_eui'],
             },
             'name': s['name'],
             'lorawan_version': s['lora_ver'][0],
@@ -84,3 +87,53 @@ def make_things_v2_file(sensors):
         '\n'.join(list(app_euis)) + '\n\n' + contents
     
     return contents
+
+def write_bmon_spreadsheet(sensors, filename):
+    """Saves an Excel spreadsheet to 'filename' that contains the neede sensor information
+    to import into BMON.
+    """
+
+    columns = [
+        ('Building', 23), 
+        ('Sensor ID', 32), 
+        ('Title', 28),
+        ('Unit Label', 11), 
+        ('Sensor Group', 29), 
+        ('Sort Order', 8),
+        ('Is Calc Field', 8),
+        ('Calc or Transform Function', 24),
+        ('Function Parameters', 33),
+    ]
+
+    # Make Workbook and get the worksheet
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Main'
+    ws.append(list(zip(*columns))[0])
+
+    # create all the sensor rows
+    for s in sensors:
+        for param, unit in s['params']:
+            rec = [
+                s['bldg'],
+                f"{s['dev_eui']}_{param}",
+                f"{s['name']} {config.param_label(param)}",
+                unit,
+            ]
+            ws.append(rec)
+
+    title = NamedStyle(name='title')
+    title.font = Font(bold=True)
+    bd = Side(style='thin', color='000000')
+    title.border = Border(bottom=bd)
+    title.alignment = Alignment(horizontal='center', wrap_text=True)
+    wb.add_named_style(title)
+
+    for col in 'ABCDEFGHI':
+        ws[f'{col}1'].style = 'title'
+
+    column_widths = list(zip(*columns))[1]
+    for i, column_width in enumerate(column_widths):
+        ws.column_dimensions[get_column_letter(i+1)].width = column_width
+
+    wb.save(filename)

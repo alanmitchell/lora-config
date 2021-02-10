@@ -88,11 +88,13 @@ rows.append([
     ])
 
 # Create the Window
-#window = sg.Window('Edit Sensors', [[sg.Column(rows, scrollable=True)]])
-window = sg.Window('Edit Sensors', rows)
+window = sg.Window('Edit Sensors', [[sg.Column(rows, scrollable=True, size=(1200, 800))]])
 
 def add_sensor_info(vals):
-    # adds info from User Input to list of sensors.
+    """Adds info from User Input to list of sensors. 'vals' is the dictionary of values that
+    come from the User Interface.  It is produced in the window.read() method of the event loop below.
+    The 'sensors' list, created above outside of this method is modified by this method.
+    """
     for ix, s in enumerate(sensors):
         # Get the configuration info for this sensor type
         info = config.sensor_models[s['model'].lower()]
@@ -127,37 +129,52 @@ def add_sensor_info(vals):
 # Create an event loop
 while True:
     event, values = window.read()
-    # End program if user closes window or
-    # presses the OK button
-    if event == "exit" or event == sg.WIN_CLOSED:
-        break
 
-    elif event == 'make-v3':
-        add_sensor_info(values)
-        file_contents = sensor_utils.make_things_v3_file(sensors)
-        fn = sg.popup_get_file(
-            'File to Save into.',
-            default_extension='json',
-            save_as=True,
-            file_types=(('JSON Files', '*.json'),),
-            no_window=True,
-            )
-        open(fn, 'w').write(file_contents)
+    try:
+        # End program if user closes window or
+        # presses the OK button
+        if event == "exit" or event == sg.WIN_CLOSED:
+            break
 
-    elif event == 'make-v2':
-        add_sensor_info(values)
-        file_contents = sensor_utils.make_things_v2_file(sensors)
-        fn = sg.popup_get_file(
-            'File to Save into.',
-            default_extension='txt',
-            save_as=True,
-            file_types=(('Text Files', '*.txt'),),
-            no_window=True,
-            )
-        open(fn, 'w').write(file_contents)
-    
-    elif event == 'make-bmon':
-        add_sensor_info(values)
+        elif event == 'make-v3':
+            add_sensor_info(values)
+            file_contents = sensor_utils.make_things_v3_file(sensors)
+            fn = sg.popup_get_file(
+                'File to Save into.',
+                default_extension='json',
+                save_as=True,
+                file_types=(('JSON Files', '*.json'),),
+                no_window=True,
+                )
+            open(fn, 'w').write(file_contents)
+            sg.popup_ok('Successful Creation of File!')
+
+        elif event == 'make-v2':
+            add_sensor_info(values)
+            file_contents = sensor_utils.make_things_v2_file(sensors)
+            fn = sg.popup_get_file(
+                'File to Save into.',
+                default_extension='txt',
+                save_as=True,
+                file_types=(('Text Files', '*.txt'),),
+                no_window=True,
+                )
+            open(fn, 'w').write(file_contents)
+            sg.popup_ok('Successful Creation of File!')
+        
+        elif event == 'make-bmon':
+            add_sensor_info(values)
+            fn = sg.popup_get_file(
+                'File to Save into.',
+                default_extension='xlsx',
+                save_as=True,
+                file_types=(('Excel Files', '*.xlsx'),),
+                no_window=True,
+                )
+            sensor_utils.write_bmon_spreadsheet(sensors, fn)
+            sg.popup_ok('Successful Creation of File!')
+
+    except Exception as e:
+        sg.popup_error(str(e))
 
 window.close()
-
