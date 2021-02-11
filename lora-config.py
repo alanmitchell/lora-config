@@ -41,10 +41,11 @@ while True:
             bldgs = [lin.split(':') for lin in values['bldgs'].splitlines() if len(lin.strip())]
             bldgs = [(abbrev.strip(), title.strip()) for abbrev, title in bldgs]
         except:
-            sg.popup('Bad format in Building List.  Exactly one colon per line is required.')
+            sg.popup_error('Bad format in Building List.  Exactly one colon per line is required.')
             continue
         break
-    if event == 'cancel' or event == sg.WIN_CLOSED:
+
+    elif event == 'cancel' or event == sg.WIN_CLOSED:
         sys.exit(0)
 
 win_init.close()
@@ -54,7 +55,7 @@ win_init.close()
 try:
     sensors = sensor_utils.read_sensor_file(sensor_file)
 except Exception as e:
-    sg.popup(f'Error: {e}')
+    sg.popup_error(f'Error reading Sensor File: {e}')
     sys.exit(0)
 
 bldg_abbrevs = [abbrev for abbrev, _ in bldgs]

@@ -2,7 +2,7 @@
 """
 
 import json
-import pandas as pd
+import csv
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Font, Border, Side, Alignment
 from openpyxl.utils import get_column_letter
@@ -26,14 +26,17 @@ def read_elsys_file(fn):
     info for each sensor.
     """
     recs = []
-    for _, row in pd.read_csv(fn, delimiter=';', dtype='str').iterrows():
-        recs.append(dict(
-            model = row.SKU,
-            dev_eui = row.EUI,
-            app_eui = row.AppEUI,
-            app_key = row.AppKey
-        ))
-    
+
+    with open(fn, newline='') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        for row in reader:
+            recs.append(dict(
+                model = row['SKU'],
+                dev_eui = row['EUI'],
+                app_eui = row['AppEUI'],
+                app_key = row["AppKey"]
+            ))
+        
     return recs
 
 def make_things_v3_file(sensors):
