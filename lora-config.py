@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 """Main script to start LoRaWAN sensor configuration program.
+
+Create a standalone executable file with
+
+    pyinstaller -wF lora-config.py
+    
 """
 
 import sys
