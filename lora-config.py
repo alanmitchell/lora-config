@@ -3,6 +3,7 @@
 """
 
 import sys
+import os
 from pathlib import Path
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Button
@@ -162,6 +163,7 @@ while True:
                 )
             open(fn, 'w').write(file_contents)
             sg.popup_ok('Successful Creation of File!')
+            os.system(f'start {fn}')
         
         elif event == 'make-bmon':
             add_sensor_info(values)
@@ -174,6 +176,7 @@ while True:
                 )
             sensor_utils.write_bmon_spreadsheet(sensors, fn)
             sg.popup_ok('Successful Creation of File!')
+            os.system(f'start {fn}')
 
     except Exception as e:
         sg.popup_error(str(e))
