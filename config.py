@@ -5,13 +5,13 @@
 frequency_plan_id = 'US_902_928_FSB_2'
 
 # Constants that specify the LoRaWAN and PHY version
-ver_1_0_2b = ('MAC_V1_0_2', 'PHY_V1_0_2_REV_B')
+ver_1_0_3 = ('MAC_V1_0_3', 'PHY_V1_0_3_REV_A')
 
 # List of Sensor Models supported and their characteristics.  Use lowercase for model.
 
 sensor_models = {
     'elt2': {
-        'lora_ver': ver_1_0_2b,
+        'lora_ver': ver_1_0_3,
         'params': [                           # This list covers the built-in reading types
             ('temperature', 'deg F'), 
             ('humidity', '%RH'), 
@@ -29,7 +29,7 @@ sensor_models = {
         ],
     },
     'eltlite': {
-        'lora_ver': ver_1_0_2b,
+        'lora_ver': ver_1_0_3,
         'params': [('vdd', 'Volts')],
         'ext_types': [
             ('Temperature', ('extTemperature', 'deg F')),
@@ -39,7 +39,7 @@ sensor_models = {
         ],
     },
     'ers': {
-        'lora_ver': ver_1_0_2b,
+        'lora_ver': ver_1_0_3,
         'params': [
             ('temperature', 'deg F'), 
             ('humidity', '%RH'),
@@ -50,7 +50,7 @@ sensor_models = {
         'ext_types': [],
     },
     'ersco2': {
-        'lora_ver': ver_1_0_2b,
+        'lora_ver': ver_1_0_3,
         'params': [
             ('temperature', 'deg F'), 
             ('humidity', '%RH'),
@@ -62,7 +62,7 @@ sensor_models = {
         'ext_types': [],
     },
     'erslite': {
-        'lora_ver': ver_1_0_2b,
+        'lora_ver': ver_1_0_3,
         'params': [
             ('temperature', 'deg F'), 
             ('humidity', '%RH'),
